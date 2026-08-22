@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.OrdersMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Orders">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_type" property="orderType"/>
+        <result column="ticket_id" property="ticketId"/>
+        <result column="equipment_id" property="equipmentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="amount" property="amount"/>
+        <result column="status" property="status"/>
+        <result column="payment_method" property="paymentMethod"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="create_time" property="createTime"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, order_id, user_id, order_type, ticket_id, equipment_id, course_id, amount, status, payment_method, cancel_reason, create_time, end_time
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM orders
+        WHERE id = #{id}
+    </select>
+
+    <select id="getByIdAndUserId" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumnList"/>
+        FROM orders
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <sql id="UserOrderDetailColumns">
+        o.id,
+        o.order_id AS orderId,
+        o.order_type AS orderType,
+        o.ticket_id AS ticketId,
+        o.equipment_id AS equipmentId,
+        o.course_id AS courseId,
+        CASE
+            WHEN o.order_type = '雪票' THEN t.name
+            WHEN o.order_type = '雪具租赁' THEN e.name
+            WHEN o.order_type = '课程' THEN c.title
+            ELSE '未知商品'
+        END AS productName,
+        o.amount,
+        o.status,
+        o.payment_method AS paymentMethod,
+        o.cancel_reason AS cancelReason,
+        u.name AS userName,
+        u.phone AS userPhone,
+        o.create_time AS createTime,
+        o.end_time AS endTime
+    </sql>
+
+    <select id="getUserOrderDetails" resultType="com.ski.ticketing.pojo.vo.OrderDetailVO">
+        SELECT <include refid="UserOrderDetailColumns"/>
+        FROM orders o
+        LEFT JOIN ticket t ON o.ticket_id = t.id
+        LEFT JOIN equipment e ON o.equipment_id = e.id
+        LEFT JOIN courses c ON o.course_id = c.id
+        LEFT JOIN user u ON o.user_id = u.id
+        WHERE o.user_id = #{userId}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <select id="getUserOrderDetail" resultType="com.ski.ticketing.pojo.vo.OrderDetailVO">
+        SELECT <include refid="UserOrderDetailColumns"/>
+        FROM orders o
+        LEFT JOIN ticket t ON o.ticket_id = t.id
+        LEFT JOIN equipment e ON o.equipment_id = e.id
+        LEFT JOIN courses c ON o.course_id = c.id
+        LEFT JOIN user u ON o.user_id = u.id
+        WHERE o.id = #{id} AND o.user_id = #{userId}
+    </select>
+
+    <select id="search" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM orders
+        <where>
+            <if test="id != null">AND id = #{id}</if>
+            <if test="orderId != null">AND order_id = #{orderId}</if>
+            <if test="orderType != null">AND order_type = #{orderType}</if>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="searchByPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM orders
+        <where>
+            <if test="id != null">AND id = #{id}</if>
+            <if test="orderId != null">AND order_id = #{orderId}</if>
+            <if test="orderType != null">AND order_type = #{orderType}</if>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" parameterType="java.util.Map" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM orders
+        <where>
+            <if test="id != null">AND id = #{id}</if>
+            <if test="orderId != null">AND order_id = #{orderId}</if>
+            <if test="orderType != null">AND order_type = #{orderType}</if>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Orders" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders (order_id, user_id, order_type, ticket_id, equipment_id, course_id, amount, status, create_time)
+        VALUES (#{orderId}, #{userId}, #{orderType}, #{ticketId}, #{equipmentId}, #{courseId}, #{amount}, #{status}, #{createTime})
+    </insert>
+
+    <update id="updateStatus" parameterType="java.util.Map">
+        UPDATE orders
+        SET status = #{status}
+        <if test="cancelReason != null">, cancel_reason = #{cancelReason}</if>
+        <if test="endTime != null">, end_time = #{endTime}</if>
+        WHERE id = #{id}
+    </update>
+
+    <update id="pay" parameterType="java.util.Map">
+        UPDATE orders
+        SET status = '已支付', payment_method = #{paymentMethod}
+        WHERE id = #{id} AND user_id = #{userId} AND status = '待支付'
+    </update>
+
+    <update id="cancel" parameterType="java.util.Map">
+        UPDATE orders
+        SET status = #{newStatus}, cancel_reason = #{cancelReason}, end_time = NOW()
+        WHERE id = #{id} AND user_id = #{userId} AND status = #{oldStatus}
+    </update>
+
+    <update id="completeEquipmentReturn" parameterType="java.util.Map">
+        UPDATE orders
+        SET status = '已完成', end_time = NOW()
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND order_type = '雪具租赁'
+          AND status = '已支付'
+    </update>
+
+</mapper>

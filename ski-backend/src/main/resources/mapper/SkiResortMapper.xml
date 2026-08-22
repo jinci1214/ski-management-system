@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ski.ticketing.mapper.SkiResortMapper">
+    <sql id="columns">
+        id, name, city, address, phone, open_time, close_time, introduction, image, status, create_time, update_time
+    </sql>
+
+    <select id="getById" resultType="com.ski.ticketing.pojo.entity.SkiResort">
+        SELECT <include refid="columns"/> FROM ski_resort WHERE id = #{id}
+    </select>
+    <select id="getAll" resultType="com.ski.ticketing.pojo.entity.SkiResort">
+        SELECT <include refid="columns"/> FROM ski_resort ORDER BY id DESC
+    </select>
+    <select id="getByPage" resultType="com.ski.ticketing.pojo.entity.SkiResort">
+        SELECT <include refid="columns"/> FROM ski_resort ORDER BY id DESC LIMIT #{offset}, #{pageSize}
+    </select>
+    <select id="count" resultType="long">SELECT COUNT(*) FROM ski_resort</select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ski_resort
+        (name, city, address, phone, open_time, close_time, introduction, image, status)
+        VALUES
+        (#{name}, #{city}, #{address}, #{phone}, #{openTime}, #{closeTime}, #{introduction}, #{image}, #{status})
+    </insert>
+    <update id="update">
+        UPDATE ski_resort
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="openTime != null">open_time = #{openTime},</if>
+            <if test="closeTime != null">close_time = #{closeTime},</if>
+            <if test="introduction != null">introduction = #{introduction},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">DELETE FROM ski_resort WHERE id = #{id}</delete>
+</mapper>

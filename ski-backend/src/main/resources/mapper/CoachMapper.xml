@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ski.ticketing.mapper.CoachMapper">
+    <sql id="columns">
+        id, name, gender, phone, level, years_of_experience, certificate, status, introduction, create_time, update_time
+    </sql>
+    <select id="getById" resultType="com.ski.ticketing.pojo.entity.Coach">
+        SELECT <include refid="columns"/> FROM coach WHERE id = #{id}
+    </select>
+    <select id="getAll" resultType="com.ski.ticketing.pojo.entity.Coach">
+        SELECT <include refid="columns"/> FROM coach ORDER BY id DESC
+    </select>
+    <select id="getByPage" resultType="com.ski.ticketing.pojo.entity.Coach">
+        SELECT <include refid="columns"/> FROM coach ORDER BY id DESC LIMIT #{offset}, #{pageSize}
+    </select>
+    <select id="count" resultType="long">SELECT COUNT(*) FROM coach</select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO coach
+        (name, gender, phone, level, years_of_experience, certificate, status, introduction)
+        VALUES
+        (#{name}, #{gender}, #{phone}, #{level}, #{yearsOfExperience}, #{certificate}, #{status}, #{introduction})
+    </insert>
+    <update id="update">
+        UPDATE coach
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="yearsOfExperience != null">years_of_experience = #{yearsOfExperience},</if>
+            <if test="certificate != null">certificate = #{certificate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="introduction != null">introduction = #{introduction},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">DELETE FROM coach WHERE id = #{id}</delete>
+</mapper>

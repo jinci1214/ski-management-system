@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.EquipmentMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Equipment">
+        <id column="id" property="id"/>
+        <result column="resort_id" property="resortId"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="total" property="total"/>
+        <result column="remaining" property="remaining"/>
+        <result column="overtime_fee" property="overtimeFee"/>
+        <result column="deposit" property="deposit"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, resort_id, name, price, total, remaining, overtime_fee, deposit
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM equipment
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM equipment
+        ORDER BY id ASC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM equipment
+        ORDER BY id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM equipment
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Equipment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO equipment (resort_id, name, price, total, remaining, overtime_fee, deposit)
+        VALUES (#{resortId}, #{name}, #{price}, #{total}, #{remaining}, #{overtimeFee}, #{deposit})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.Equipment">
+        UPDATE equipment
+        <set>
+            <if test="resortId != null">resort_id = #{resortId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="total != null">total = #{total},</if>
+            <if test="remaining != null">remaining = #{remaining},</if>
+            <if test="overtimeFee != null">overtime_fee = #{overtimeFee},</if>
+            <if test="deposit != null">deposit = #{deposit},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM equipment WHERE id = #{id}
+    </delete>
+
+    <update id="decreaseRemaining" parameterType="java.lang.Long">
+        UPDATE equipment SET remaining = remaining - 1 WHERE id = #{id} AND remaining > 0
+    </update>
+
+    <update id="increaseRemaining" parameterType="java.lang.Long">
+        UPDATE equipment SET remaining = LEAST(remaining + 1, total) WHERE id = #{id}
+    </update>
+
+</mapper>

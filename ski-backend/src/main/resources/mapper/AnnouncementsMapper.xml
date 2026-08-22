@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.AnnouncementsMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Announcements">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="category" property="category"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, title, content, category, publish_time, create_time
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="searchByCategory" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        WHERE category LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="searchByTitle" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        WHERE title LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="searchByContent" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        WHERE content LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="getByPublishDate" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        WHERE DATE(publish_time) LIKE CONCAT('%', #{date}, '%')
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM announcements
+        ORDER BY publish_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM announcements
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Announcements" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO announcements (title, content, category, publish_time)
+        VALUES (#{title}, #{content}, #{category}, #{publishTime})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.Announcements">
+        UPDATE announcements
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="category != null">category = #{category},</if>
+            publish_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM announcements WHERE id = #{id}
+    </delete>
+
+</mapper>

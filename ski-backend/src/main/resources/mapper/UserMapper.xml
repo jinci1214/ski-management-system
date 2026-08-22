@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar" property="avatar"/>
+        <result column="username_update_time" property="usernameUpdateTime"/>
+        <result column="password_update_time" property="passwordUpdateTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, username, password, name, phone, avatar, username_update_time, password_update_time, create_time, update_time
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <select id="getByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password, name, phone)
+        VALUES (#{username}, #{password}, #{name}, #{phone})
+    </insert>
+
+    <update id="updateProfile" parameterType="com.ski.ticketing.pojo.entity.User">
+        UPDATE user
+        SET name = #{name}, phone = #{phone}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateAvatar" parameterType="com.ski.ticketing.pojo.entity.User">
+        UPDATE user SET avatar = #{avatar}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateUsername" parameterType="com.ski.ticketing.pojo.entity.User">
+        UPDATE user SET username = #{username}, username_update_time = NOW(), update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword" parameterType="com.ski.ticketing.pojo.entity.User">
+        UPDATE user SET password = #{password}, password_update_time = NOW(), update_time = NOW() WHERE id = #{id}
+    </update>
+
+</mapper>

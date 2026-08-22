@@ -1,0 +1,22 @@
+# Java
+ski-backend/target/
+*.class
+
+# Vue / Node
+ski-frontend/node_modules/
+ski-frontend/dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+application-local.yml
+application-local.properties
+
+# System
+.DS_Store
+Thumbs.db

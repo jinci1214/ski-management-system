@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.TicketMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Ticket">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="ski_run_id" property="skiRunId"/>
+        <result column="price" property="price"/>
+        <result column="hour" property="hour"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, name, ski_run_id, price, hour, description, status
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ticket
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ticket
+        ORDER BY id ASC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ticket
+        ORDER BY id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM ticket
+    </select>
+
+    <select id="getByStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ticket
+        WHERE status = #{status}
+        ORDER BY id ASC
+    </select>
+
+    <select id="getBySkiRunId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ticket
+        WHERE ski_run_id = #{skiRunId}
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Ticket" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ticket (name, ski_run_id, price, hour, description, status)
+        VALUES (#{name}, #{skiRunId}, #{price}, #{hour}, #{description}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.Ticket">
+        UPDATE ticket
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="skiRunId != null">ski_run_id = #{skiRunId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="hour != null">hour = #{hour},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus" parameterType="java.util.Map">
+        UPDATE ticket
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM ticket WHERE id = #{id}
+    </delete>
+
+</mapper>

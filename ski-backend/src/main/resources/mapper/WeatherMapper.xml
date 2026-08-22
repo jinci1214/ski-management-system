@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.WeatherMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Weather">
+        <id column="id" property="id"/>
+        <result column="resort_id" property="resortId"/>
+        <result column="date" property="date"/>
+        <result column="temperature_min" property="temperatureMin"/>
+        <result column="temperature_max" property="temperatureMax"/>
+        <result column="weather" property="weather"/>
+        <result column="wind" property="wind"/>
+        <result column="snow" property="snow"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, resort_id, date, temperature_min, temperature_max, weather, wind, snow, create_time
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM weather
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM weather
+        ORDER BY date DESC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM weather
+        ORDER BY date DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM weather
+    </select>
+
+    <select id="getByWeather" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM weather
+        WHERE weather = #{weather}
+        ORDER BY date DESC
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Weather" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO weather (resort_id, date, temperature_min, temperature_max, weather, wind, snow)
+        VALUES (#{resortId}, #{date}, #{temperatureMin}, #{temperatureMax}, #{weather}, #{wind}, #{snow})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.Weather">
+        UPDATE weather
+        <set>
+            <if test="resortId != null">resort_id = #{resortId},</if>
+            <if test="date != null">date = #{date},</if>
+            <if test="temperatureMin != null">temperature_min = #{temperatureMin},</if>
+            <if test="temperatureMax != null">temperature_max = #{temperatureMax},</if>
+            <if test="weather != null">weather = #{weather},</if>
+            <if test="wind != null">wind = #{wind},</if>
+            <if test="snow != null">snow = #{snow},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM weather WHERE id = #{id}
+    </delete>
+
+</mapper>

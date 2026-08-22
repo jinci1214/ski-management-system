@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.Courses">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="teacher" property="teacher"/>
+        <result column="coach_id" property="coachId"/>
+        <result column="ski_run_id" property="skiRunId"/>
+        <result column="number" property="number"/>
+        <result column="course_time" property="courseTime"/>
+        <result column="hours" property="hours"/>
+        <result column="price" property="price"/>
+        <result column="level" property="level"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, title, content, teacher, coach_id, ski_run_id, number, course_time, hours, price, level
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM courses
+        WHERE id = #{id}
+    </select>
+
+    <select id="getBySkiRunId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM courses
+        WHERE ski_run_id = #{skiRunId}
+        ORDER BY course_time ASC
+    </select>
+
+    <select id="getByLevel" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM courses
+        WHERE level = #{level}
+        ORDER BY course_time ASC
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM courses
+        ORDER BY course_time ASC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM courses
+        ORDER BY course_time ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM courses
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.Courses" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO courses (title, content, teacher, coach_id, ski_run_id, number, course_time, hours, price, level)
+        VALUES (#{title}, #{content}, #{teacher}, #{coachId}, #{skiRunId}, #{number}, #{courseTime}, #{hours}, #{price}, #{level})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.Courses">
+        UPDATE courses
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="teacher != null">teacher = #{teacher},</if>
+            <if test="coachId != null">coach_id = #{coachId},</if>
+            <if test="skiRunId != null">ski_run_id = #{skiRunId},</if>
+            <if test="number != null">number = #{number},</if>
+            <if test="courseTime != null">course_time = #{courseTime},</if>
+            <if test="hours != null">hours = #{hours},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="level != null">level = #{level},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM courses WHERE id = #{id}
+    </delete>
+
+    <update id="decreaseNumber" parameterType="java.lang.Long">
+        UPDATE courses SET number = number - 1 WHERE id = #{id} AND number > 0
+    </update>
+
+    <update id="increaseNumber" parameterType="java.lang.Long">
+        UPDATE courses SET number = number + 1 WHERE id = #{id}
+    </update>
+
+</mapper>

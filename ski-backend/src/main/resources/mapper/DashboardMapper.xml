@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ski.ticketing.mapper.DashboardMapper">
+
+    <!-- 营业额只统计未退款、未取消且已完成支付的订单。 -->
+    <select id="getOverview" resultType="com.ski.ticketing.pojo.vo.DashboardStatisticsVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`) AS user_count,
+            (SELECT COUNT(*) FROM orders) AS order_count,
+            (SELECT COUNT(*)
+             FROM orders
+             WHERE create_time &gt;= CURDATE()
+               AND create_time &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)) AS today_order_count,
+            COALESCE((SELECT SUM(amount)
+                      FROM orders
+                      WHERE status IN ('已支付', '已完成')
+                        AND create_time &gt;= CURDATE()
+                        AND create_time &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)), 0) AS today_revenue,
+            (SELECT COUNT(*) FROM orders WHERE status = '待支付') AS pending_order_count,
+            (SELECT COUNT(*) FROM ski_resort) AS resort_count,
+            (SELECT COUNT(*) FROM facility WHERE status = '正常') AS normal_facility_count,
+            COALESCE((SELECT ROUND(AVG(rating), 1)
+                      FROM feedback
+                      WHERE rating IS NOT NULL), 0) AS average_rating
+    </select>
+
+    <select id="getOrderTypeDistribution"
+            resultType="com.ski.ticketing.pojo.vo.OrderTypeStatisticsVO">
+        SELECT order_type, COUNT(*) AS count
+        FROM orders
+        GROUP BY order_type
+    </select>
+
+    <select id="getRecentRevenue" resultType="com.ski.ticketing.pojo.vo.DailyRevenueVO">
+        SELECT DATE(create_time) AS date, COALESCE(SUM(amount), 0) AS revenue
+        FROM orders
+        WHERE status IN ('已支付', '已完成')
+          AND create_time &gt;= #{startDate}
+          AND create_time &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+        GROUP BY DATE(create_time)
+        ORDER BY date
+    </select>
+
+</mapper>

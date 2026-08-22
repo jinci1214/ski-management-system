@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ski.ticketing.mapper.SkiRunMapper">
+
+    <resultMap id="BaseResultMap" type="com.ski.ticketing.pojo.entity.SkiRun">
+        <id column="id" property="id"/>
+        <result column="resort_id" property="resortId"/>
+        <result column="name" property="name"/>
+        <result column="level" property="level"/>
+        <result column="length" property="length"/>
+        <result column="height" property="height"/>
+        <result column="image" property="image"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, resort_id, name, level, length, height, image, create_time, update_time
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ski_run
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ski_run
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getByLevel" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ski_run
+        WHERE level = #{level}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM ski_run
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM ski_run
+    </select>
+
+    <insert id="insert" parameterType="com.ski.ticketing.pojo.entity.SkiRun" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ski_run (resort_id, name, level, length, height, image)
+        VALUES (#{resortId}, #{name}, #{level}, #{length}, #{height}, #{image})
+    </insert>
+
+    <update id="update" parameterType="com.ski.ticketing.pojo.entity.SkiRun">
+        UPDATE ski_run
+        <set>
+            <if test="resortId != null">resort_id = #{resortId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="length != null">length = #{length},</if>
+            <if test="height != null">height = #{height},</if>
+            <if test="image != null">image = #{image},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM ski_run WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteTicketsBySkiRunId" parameterType="java.lang.Long">
+        DELETE FROM ticket WHERE ski_run_id = #{skiRunId}
+    </delete>
+
+    <delete id="deleteCoursesBySkiRunId" parameterType="java.lang.Long">
+        DELETE FROM courses WHERE ski_run_id = #{skiRunId}
+    </delete>
+
+</mapper>

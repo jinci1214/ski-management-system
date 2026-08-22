@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ski.ticketing.mapper.FacilityMapper">
+    <sql id="columns">
+        id, resort_id, name, type, location, status, last_check_time, description, create_time, update_time
+    </sql>
+    <select id="getById" resultType="com.ski.ticketing.pojo.entity.Facility">
+        SELECT <include refid="columns"/> FROM facility WHERE id = #{id}
+    </select>
+    <select id="getAll" resultType="com.ski.ticketing.pojo.entity.Facility">
+        SELECT <include refid="columns"/> FROM facility ORDER BY id DESC
+    </select>
+    <select id="getByResortId" resultType="com.ski.ticketing.pojo.entity.Facility">
+        SELECT <include refid="columns"/> FROM facility WHERE resort_id = #{resortId} ORDER BY id DESC
+    </select>
+    <select id="getByPage" resultType="com.ski.ticketing.pojo.entity.Facility">
+        SELECT <include refid="columns"/> FROM facility ORDER BY id DESC LIMIT #{offset}, #{pageSize}
+    </select>
+    <select id="count" resultType="long">SELECT COUNT(*) FROM facility</select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO facility
+        (resort_id, name, type, location, status, last_check_time, description)
+        VALUES
+        (#{resortId}, #{name}, #{type}, #{location}, #{status}, #{lastCheckTime}, #{description})
+    </insert>
+    <update id="update">
+        UPDATE facility
+        <set>
+            <if test="resortId != null">resort_id = #{resortId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="lastCheckTime != null">last_check_time = #{lastCheckTime},</if>
+            <if test="description != null">description = #{description},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">DELETE FROM facility WHERE id = #{id}</delete>
+</mapper>

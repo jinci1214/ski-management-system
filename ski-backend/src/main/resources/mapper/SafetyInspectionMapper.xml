@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ski.ticketing.mapper.SafetyInspectionMapper">
+    <sql id="columns">
+        id, ski_run_id, employee_id, inspection_time, snow_condition, safety_status, problem, action, create_time
+    </sql>
+    <select id="getById" resultType="com.ski.ticketing.pojo.entity.SafetyInspection">
+        SELECT <include refid="columns"/> FROM safety_inspection WHERE id = #{id}
+    </select>
+    <select id="getAll" resultType="com.ski.ticketing.pojo.entity.SafetyInspection">
+        SELECT <include refid="columns"/> FROM safety_inspection ORDER BY inspection_time DESC
+    </select>
+    <select id="getByPage" resultType="com.ski.ticketing.pojo.entity.SafetyInspection">
+        SELECT <include refid="columns"/> FROM safety_inspection ORDER BY inspection_time DESC LIMIT #{offset}, #{pageSize}
+    </select>
+    <select id="count" resultType="long">SELECT COUNT(*) FROM safety_inspection</select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO safety_inspection
+        (ski_run_id, employee_id, inspection_time, snow_condition, safety_status, problem, action)
+        VALUES
+        (#{skiRunId}, #{employeeId}, #{inspectionTime}, #{snowCondition}, #{safetyStatus}, #{problem}, #{action})
+    </insert>
+    <update id="update">
+        UPDATE safety_inspection
+        <set>
+            <if test="skiRunId != null">ski_run_id = #{skiRunId},</if>
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="inspectionTime != null">inspection_time = #{inspectionTime},</if>
+            <if test="snowCondition != null">snow_condition = #{snowCondition},</if>
+            <if test="safetyStatus != null">safety_status = #{safetyStatus},</if>
+            <if test="problem != null">problem = #{problem},</if>
+            <if test="action != null">action = #{action},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">DELETE FROM safety_inspection WHERE id = #{id}</delete>
+</mapper>

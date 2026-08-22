@@ -1,0 +1,13 @@
+export const skiRunLevels = ['初级', '中级', '高级', '专家级']
+export const coachLevels = ['初级教练', '中级教练', '高级教练']
+export const facilityTypes = ['缆车', '造雪机', '服务设施', '救援设施']
+export const facilityStatuses = ['正常', '维护中', '停用']
+export const weatherTypes = ['晴', '多云', '雪', '雨', '室内']
+export const snowTypes = ['新雪', '压雪', '硬雪', '粉雪']
+export const announcementCategories = ['雪道更新', '雪票更新', '开放时间', '天气', '课程更新', '宣传']
+export const orderTypes = ['雪票', '雪具租赁', '课程']
+export const orderStatuses = ['待支付', '已支付', '已完成', '已取消', '已退款']
+export const paymentMethods = ['微信', '支付宝', '现金']
+export const feedbackTypes = ['服务评价', '设施建议', '安全问题', '其他']
+export const safetyStatuses = ['安全', '需处理', '已关闭']
+

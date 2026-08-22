@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: heilongjiang-ski-management
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/heilongjiang_ski_management?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+alioss:
+  endpoint: oss-cn-beijing.aliyuncs.com
+  access-key-id: ${ALIYUN_OSS_ACCESS_KEY_ID:}
+  access-key-secret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:}
+  bucket-name: ${ALIYUN_OSS_BUCKET_NAME:ski-ticketing-xj}
+
+server:
+  port: 8081
+
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ski.ticketing.pojo.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.ski: debug
+
+ski:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥（至少32个字符）
+    admin-secret-key: ${SKI_JWT_SECRET:heilongjiang_ski_management_jwt_secret_key_must_be_256_bits}
+    # 设置jwt过期时间（2小时）
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
